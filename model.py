@@ -5,7 +5,10 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Embedding
 from keras.layers import Dropout
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import EarlyStopping
 from pickle import dump
+import plot as pl
 import numpy as np
 # To Do
 # - Testare differenti tipi di architetture per la rete neurale (Layers,Activation function,dropout,batch size,epochs)
@@ -14,7 +17,7 @@ import numpy as np
 # - Valutare l'idea di un'approccio character-based
 
 #Initialize parameters
-SEQUENCE_LEN = 50 # The length of each sequence used to predict
+SEQUENCE_LEN = 20 # The length of each sequence used to predict
 STEP = 1 # Stride
 X = [] # Input Variables 
 Y = [] # Output Variables
@@ -48,7 +51,9 @@ print('Number of Sequences:', len(X))
 X = np.array(X)
 Y = np.array(Y)
 Y = to_categorical(Y, num_classes=vocab_size)
+
 # Create the neural network
+model_filepath="weights.best.hdf5"
 model = Sequential()
 model.add(Embedding(vocab_size, 50, input_length=X.shape[1]))
 model.add(LSTM(100, return_sequences=True))
@@ -57,8 +62,14 @@ model.add(LSTM(100))
 model.add(Dropout(0.2))
 model.add(Dense(100, activation='relu'))
 model.add(Dense(vocab_size, activation='softmax'))
-print(model.summary())
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model.fit(X, Y, batch_size=128, epochs=100)
+print(model.summary())
+
+# Define Callbacks
+es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=10)
+ck = ModelCheckpoint(model_filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+
+# Start Training
+model.fit(X, Y,validation_split=0.3, batch_size=128, epochs=100,callbacks=[es,ck,pl.plot])
 model.save('model.h5')
 dump(tokenizer, open('tokenizer.pkl', 'wb'))

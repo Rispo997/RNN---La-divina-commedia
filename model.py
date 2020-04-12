@@ -28,26 +28,40 @@ with open("DC-modified.txt", encoding='utf-8') as file:
 print('Number of Characters is:', len(text))
 
 # Fetch all the words inside the file
-words = [w for w in text.split(' ') if w.strip() != '' or w == '\n']
+words = []
+padding_token = "_pad_"
+start_token = "_start_"
+for w in text.split(' '):
+  if w.strip() != '' or w != '\n':
+    if(w == start_token):
+      for i in range(SEQUENCE_LEN-1):
+        words.append(padding_token) 
+    words.append(w)
 print('Number of Words is:', len(words))
-print(words[:100])
+
 
 # Encode the words using integers
-tokenizer = Tokenizer(filters=[])
+tokenizer = Tokenizer(filters=[], lower=True, oov_token="_unk_")
 tokenizer.fit_on_texts(words)
 words_tokenized = tokenizer.texts_to_sequences(words)
 vocab_size = len(tokenizer.word_index) + 1
 print('Number of Words is:', vocab_size)
 
+
 # Flatten the resulting List
 words_tokenized = [item for sublist in words_tokenized for item in sublist]
-print(words_tokenized[3000:3005])
 
+padding_token_val = words_tokenized[0]
+start_token_val = words_tokenized[SEQUENCE_LEN-1]
+
+n = 0
 # Create Sequences
-for i in range(0, len(words_tokenized) - SEQUENCE_LEN, STEP):
-    X.append(words_tokenized[i: i + SEQUENCE_LEN])
-    Y.append(words_tokenized[i + SEQUENCE_LEN])
-print('Number of Sequences:', len(X))
+for i in range(SEQUENCE_LEN, len(words_tokenized), STEP):
+  if words_tokenized[i] != padding_token_val and words_tokenized[i] != start_token_val:
+    Y.append(words_tokenized[i])
+    X.append(words_tokenized[i-(SEQUENCE_LEN):i])
+
+
 X = np.array(X)
 Y = np.array(Y)
 Y = to_categorical(Y, num_classes=vocab_size)

@@ -8,7 +8,7 @@ from keras.layers import Dropout
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 from pickle import dump
-from plot import plot
+from utilities.plot import plot
 import numpy as np
 # To Do
 # - Testare differenti tipi di architetture per la rete neurale (Layers,Activation function,dropout,batch size,epochs)
@@ -23,7 +23,7 @@ X = [] # Input Variables
 Y = [] # Output Variables
 
 # Open the file and encode newlines as standalone symbols
-with open("DC-poem-format.txt") as file:
+with open("resources/DC-poem-format.txt") as file:
     text = file.read().lower().replace('\n', ' \n ')
 print('Number of Characters is:', len(text))
 

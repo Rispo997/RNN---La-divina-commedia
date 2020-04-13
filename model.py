@@ -8,7 +8,7 @@ from keras.layers import Dropout
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
 from pickle import dump
-import plot as pl
+from plot import plot
 import numpy as np
 # To Do
 # - Testare differenti tipi di architetture per la rete neurale (Layers,Activation function,dropout,batch size,epochs)
@@ -23,7 +23,7 @@ X = [] # Input Variables
 Y = [] # Output Variables
 
 # Open the file and encode newlines as standalone symbols
-with open("DC-modified.txt", encoding='utf-8') as file:
+with open("DC-poem-format.txt") as file:
     text = file.read().lower().replace('\n', ' \n ')
 print('Number of Characters is:', len(text))
 
@@ -32,7 +32,7 @@ words = []
 padding_token = "_pad_"
 start_token = "_start_"
 for w in text.split(' '):
-  if w.strip() != '' or w != '\n':
+  if w.strip() != '' or w == '\n':
     if(w == start_token):
       for i in range(SEQUENCE_LEN-1):
         words.append(padding_token) 
@@ -80,10 +80,10 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 print(model.summary())
 
 # Define Callbacks
-es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=10)
-ck = ModelCheckpoint(model_filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, patience=10)
+ck = ModelCheckpoint(model_filepath, monitor='accuracy', verbose=1, save_best_only=True, mode='max')
 
 # Start Training
-model.fit(X, Y,validation_split=0.3, batch_size=128, epochs=100,callbacks=[es,ck,pl.plot])
+model.fit(X, Y, batch_size=128, epochs=100,callbacks=[es,ck,plot])
 model.save('model.h5')
 dump(tokenizer, open('tokenizer.pkl', 'wb'))

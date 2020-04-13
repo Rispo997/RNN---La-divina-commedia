@@ -16,7 +16,7 @@ def evaluateText(filepath='../resources/cantica.txt'):
             result.append(check_rime(sentences[i],sentences[i+2])) # Compare A - A
             result.append(check_rime(sentences[i+1],sentences[i+3])) # Compare B - B
             comparisons += 2
-        score['rhymes'] = comparisons/sum(result) # Normalize result
+        score['rhymes'] = sum(result)/comparisons # Normalize result
         #print(score)
         
 def check_rime(first,second):

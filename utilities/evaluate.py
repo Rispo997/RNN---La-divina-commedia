@@ -1,11 +1,11 @@
 import numpy as np
 import unidecode
 
-def evaluateText(filepath='../resources/cantica.txt'):
+def evaluateText(filepath='../output/canto.txt'):
     score = dict()
     result = list()
     comparisons = 0
-    with open(filepath,encoding="utf-8") as dc:
+    with open(filepath) as dc:
         lines = list(line for line in (l.strip() for l in dc.readlines()) if line)  # Remove lines with only newline
         words_per_line = [len(line) for line in lines]
         score['mean'] = np.mean(words_per_line)
@@ -17,7 +17,7 @@ def evaluateText(filepath='../resources/cantica.txt'):
             result.append(check_rime(sentences[i+1],sentences[i+3])) # Compare B - B
             comparisons += 2
         score['rhymes'] = sum(result)/comparisons # Normalize result
-        #print(score)
+        print(score)
         
 def check_rime(first,second):
     return last_syll(first) == last_syll(second)
@@ -29,5 +29,8 @@ def last_syll(word):
     for i in reversed(range(len(word)-1)):
         if word[i] in vowels:
             return word[i+1:]
+        
+        
+evaluateText()
 
 

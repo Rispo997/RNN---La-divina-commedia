@@ -4,7 +4,7 @@ from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
 # Initialize variables
-text = 'Rispuosemi Non omo omo già fui _verse_ e li parenti miei furon lombardi'
+text = '_pad_'*19 + '_start_'
 generated = []
 n_words = 500  
 predicted_word = ''
@@ -27,5 +27,8 @@ while predicted_word != '_end_':
     text_encoded = np.append(text_encoded[0],output)
     
 # Format and print the result
-generated = ['\n' if x=='_verse_' else x for x in generated]
+generated = ['\n' if x=='_verse_' or x=='_end_' else x for x in generated]
+output = ' '.join(generated)
 print(*generated)
+with open("output/canto.txt", "w") as file:
+	file.write(output)

@@ -1,5 +1,5 @@
 lines = []
-with open("DC-modified.txt", 'r', encoding='utf8', errors='ignore') as fp:
+with open("DC-cleaned.txt", 'r', encoding='utf8', errors='ignore') as fp:
 	i = 0
 	first = True
 	for line in fp: 

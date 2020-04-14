@@ -7,39 +7,45 @@ def evaluateText(filepath='../resources/DC-cleaned.txt'):
     comparisons = 0
     with open(filepath,encoding="utf-8") as dc:
         lines = list(line for line in (l.strip() for l in dc.readlines()) if line)  # Remove lines with only newline
-        print(len(lines))
+        c1 = [len(line) for line in lines]
         chars_per_line = [len(line) for line in lines if line.find("Canto") == -1]
-        print(len(chars_per_line))
         score['mean'] = np.mean(chars_per_line)
         score['variance'] = np.var(chars_per_line)
         sentences = [line for line in lines if 'Canto' not in line]
         # Compare lines, the rhymes must be of the form: ABA BCB CDC
         start = True
-        i = 6
+        #if we are not computing the entire DC, but just a canto
+        entire_DC = False
+        if lines[0].find("Canto") == -1:
+            i = 2
+        else:
+            entire_DC = True
+            i = 3
         while i < len(lines)-1:
             #check if a cantica is read and go to the next in the right point
-            for j in range(3):
-                if lines[i-j].find("Canto") != -1:
-                   i += -j+3
-                   start = True
+            if entire_DC:
+                for j in range(3):
+                    if lines[i-j].find("Canto") != -1:
+                       i += -j+3
+                       start = True
             #if that's the first check of a cantica check A rhyme (only two verses)
             if start == True:
                 result.append(check_rime(lines[i],lines[i-2])) # Compare all the rhymes should be equal to the current verse
                 comparisons += 1
                 start = False
-                if (not check_rime(lines[i],lines[i-2])):
-                    print(lines[i])
-                    print(lines[i-2])
-                    print("-----------------")
+                # if (not check_rime(lines[i],lines[i-2])):
+                #     print(lines[i])
+                #     print(lines[i-2])
+                #     print("-----------------")
             #normal check for B in ABA BCB where i is positioned at the last B
             else:
                 result.append(check_rime(lines[i],lines[i-2]) and check_rime(lines[i-2],lines[i-4])) # Compare all the rhymes should be equal to the current verse
                 comparisons += 1
-                if (not check_rime(lines[i],lines[i-2]) and check_rime(lines[i-2],lines[i-4])):
-                    print(lines[i])
-                    print(lines[i-2])
-                    print(lines[i-4])
-                    print("-----------------")
+                # if (not (check_rime(lines[i],lines[i-2]) and check_rime(lines[i-2],lines[i-4]))):
+                #     print(lines[i])
+                #     print(lines[i-2])
+                #     print(lines[i-4])
+                #     print("-----------------")
             i+=3
         score['rhymes'] = result.count(True)/comparisons # Normalize result
         print(score)

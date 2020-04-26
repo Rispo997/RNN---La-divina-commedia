@@ -5,7 +5,7 @@ def evaluateText(filepath='../resources/DC-cleaned.txt'):
     score = dict()
     result = list()
     comparisons = 0
-    with open(filepath,encoding="utf-8") as dc:
+    with open(filepath,encoding="latin-1") as dc:
         lines = list(line for line in (l.strip() for l in dc.readlines()) if line)  # Remove lines with only newline
         c1 = [len(line) for line in lines]
         chars_per_line = [len(line) for line in lines if line.find("Canto") == -1]
@@ -81,4 +81,4 @@ def last_syll(word):
             return word[i+1:]
 
 
-evaluateText()
+evaluateText("../output/canto.txt")

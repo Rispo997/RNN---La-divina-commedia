@@ -11,6 +11,7 @@ from google.colab import drive
 drive.mount('/content/gdrive')
 
 from keras.preprocessing.text import Tokenizer
+from keras import regularizers
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 from keras.models import Sequential
@@ -20,6 +21,8 @@ from keras.layers import Embedding
 from keras.layers import Dropout
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import EarlyStopping
+from keras.optimizers import Adam
+from keras.metrics import CategoricalCrossentropy
 from pickle import dump
 import numpy as np
 from google.colab import files
@@ -52,8 +55,8 @@ class PlotLearning(Callback):
         self.x.append(self.i)
         self.losses.append(logs.get('loss'))
         self.val_losses.append(logs.get('val_loss'))
-        self.acc.append(logs.get('accuracy'))
-        self.val_acc.append(logs.get('val_accuracy'))
+        self.acc.append(logs.get('categorical_crossentropy'))
+        self.val_acc.append(logs.get('val_categorical_crossentropy'))
         self.i += 1
         f, (ax1, ax2) = plt.subplots(1, 2, sharex=True)
         
@@ -64,8 +67,8 @@ class PlotLearning(Callback):
         ax1.plot(self.x, self.val_losses, label="val_loss")
         ax1.legend()
         
-        ax2.plot(self.x, self.acc, label="accuracy")
-        ax2.plot(self.x, self.val_acc, label="validation accuracy")
+        ax2.plot(self.x, self.acc, label="cross entropy")
+        ax2.plot(self.x, self.val_acc, label="validation cross entropy")
         ax2.legend()
         
         plt.show();
@@ -80,7 +83,7 @@ print('Number of Characters is:', len(text))
 
 #Initialize parameters
 SEQUENCE_LEN = 50 # The length of each sequence used to predict
-STEP = 3 # Stride
+STEP = 1 # Stride
 X = [] # Input Variables 
 Y = [] # Output Variables
 
@@ -105,15 +108,12 @@ words_tokenized = tokenizer.texts_to_sequences(words)
 vocab_size = len(tokenizer.word_index) + 1
 print('Number of Words is:', vocab_size)
 
-
 # Flatten the resulting List
 words_tokenized = [item for sublist in words_tokenized for item in sublist]
 
 #padding_token_val = words_tokenized[0]
 start_token_val = words_tokenized[0]
 
-starts = []
-n = 0
 for i in range(1, len(words_tokenized), STEP):
   #do not predict start token
   tmp_sequence = []
@@ -123,7 +123,6 @@ for i in range(1, len(words_tokenized), STEP):
     tmp_sequence = words_tokenized[lower_bound:i]
     try:
       index = tmp_sequence.index(start_token_val)
-      starts.append(index)
       tmp_sequence = tmp_sequence[index:]
     except:
       pass 
@@ -133,21 +132,9 @@ for i in range(1, len(words_tokenized), STEP):
     Y.append(words_tokenized[i])
 print('Number of Sequences:', len(X), len(Y))
 
-end_token_val = words_tokenized[starts[1]-1]
-print(words_tokenized.count(end_token_val))
-#for s in starts:
-print(end_token_val)
-print(words[starts[2]])
-print(".", words[starts[2]-1], ".")
-print(words[starts[2]-2])
-
-
 X = np.array(X)
 Y = np.array(Y)
 Y = to_categorical(Y, num_classes=vocab_size)
-
-from sklearn.utils import shuffle
-X, Y = shuffle(X, Y, random_state=0)
 
 # Create the neural network
 model_filepath="weights.best.hdf5"
@@ -159,13 +146,13 @@ model.add(LSTM(100))
 model.add(Dropout(0.2))
 model.add(Dense(100, activation='relu'))
 model.add(Dense(vocab_size, activation='softmax'))
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['categorical_crossentropy'])
 print(model.summary())
 
 # Define Callbacks
-es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, patience=5)
-ck = ModelCheckpoint(model_filepath, monitor='accuracy', verbose=1, save_best_only=True, mode='max')
+es = EarlyStopping(monitor='categorical_crossentropy', mode='min', verbose=2, patience=5)
+ck = ModelCheckpoint(model_filepath, monitor='categorical_crossentropy', verbose=1, save_best_only=True, mode='min')
 
 # Start Training
-model.fit(X, Y, batch_size=128, epochs=25,callbacks=[es,ck,PlotLearning()])
+model.fit(X, Y, batch_size=128, epochs=100, callbacks=[es,ck,PlotLearning()])
 model.save('/content/gdrive/My Drive/Dante_model/model.h5')

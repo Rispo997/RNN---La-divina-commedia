@@ -79,7 +79,8 @@ print('The length of the text:', len(words))
 vocab_size = len(set(words))
 tokens = list(set(words))
 
-
+#print(text_encoded)
+#print("\n")
 #while predicted_word != '_end_':
 for i in range(n_words):
     # Fix the input sequence's length and predict the word
@@ -97,6 +98,8 @@ for i in range(n_words):
     #print(output)
     predicted_word = tokens[output[0]]
     text_encoded = process_sequence(text_encoded,Model[predicted_word])
+    #print(text_encoded)
+    #print("\n")
     generated.append(predicted_word)
     # Update the input text for next prediction
     if predicted_word == '_end_':
@@ -109,5 +112,5 @@ for i in range(n_words):
 generated = ['\n' if x=='_verse_' or x=='_end_' else x for x in generated]
 output = ' '.join(generated)
 print(*generated)
-with open("output/seq50epoch100.txt", "w") as file:
-	file.write(output)
+#with open("output/seq50epoch100.txt", "w") as file:
+#	file.write(output)

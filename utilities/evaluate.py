@@ -80,5 +80,7 @@ def last_syll(word):
         if word[i] in vowels:
             return word[i+1:]
 
-
-evaluateText("../output/canto.txt")
+print("DC: ")
+evaluateText()
+print("\nOur Model: ")
+evaluateText("../output/seq50epoch100.txt")

@@ -3,7 +3,7 @@ from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
-def sample(preds, temperature=0.01):
+def sample(preds, temperature=0.05):
       # helper function to sample an index from a probability array
     preds = np.asarray(preds).astype('float64')
     preds = np.log(preds) / temperature
@@ -14,7 +14,7 @@ def sample(preds, temperature=0.01):
     return np.argmax(probas)
     
 # # Initialize variables
-text = '_pad_ '*49 + ' _start_ '
+text = '_start_'
 print(text)
 generated = []
 n_words = 1000 
@@ -22,7 +22,7 @@ predicted_word = ''
 
 # Load pre-trained data
 model = load_model('models/weightsHLP-100-2.8770.hdf5')
-tokenizer = load(open('models/tokenizer.pkl', 'rb'))
+tokenizer = load(open('models/tokenizerHighLevelPadding.pkl', 'rb'))
 # Encode initial input
 text_encoded = tokenizer.texts_to_sequences([text])[0]
 
@@ -38,7 +38,7 @@ while predicted_word != '_end_':
     output = np.array([val])
     predicted_word = tokenizer.sequences_to_texts([output])[0]
     generated.append(predicted_word)
-    text_encoded = np.append(text_encoded[0],sample(prediction))
+    text_encoded = np.append(text_encoded[0], val)
     
     
 # Format and print the result

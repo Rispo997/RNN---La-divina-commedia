@@ -1,5 +1,32 @@
+rhymes = ['_000_ ', '_001_ ']
+rhymes_counter = [1, 0]
+currentRhyme = 0
+next = 2
+firstRhyme = True;
+
+def initRhymeTagSystem():
+	global next
+	global rhymes 
+	global rhymes_counter
+	global currentRhyme
+	global firstRhyme
+	rhymes = ['_000_ ', '_001_ ']
+	rhymes_counter = [1, 0]
+	currentRhyme = 0
+	next = 2
+	firstRhyme = True;
+
+def nextRhymeTag():
+	global next
+	rhymes[0] = rhymes[1]
+	rhymes[1] = '_{:0>3}_ '.format(str(next))
+	rhymes_counter[0] = rhymes_counter[1]
+	rhymes_counter[1] = 0
+	next = next + 1
+
+
 lines = []
-with open("DC-cleaned.txt", 'r', encoding='utf8', errors='ignore') as fp:
+with open("../resources/DC-cleaned.txt", 'r', encoding='utf8', errors='ignore') as fp:
 	i = 0
 	first = True
 	for line in fp: 
@@ -10,8 +37,18 @@ with open("DC-cleaned.txt", 'r', encoding='utf8', errors='ignore') as fp:
 					lines.append(" _end_ ")
 				first = False
 				lines.append("_start_ ")
+				#initRhymeTagSystem()
 			else:
-				lines.append(line[:-1])
+				#insert rhyme tag
+				# lines.append(rhymes[currentRhyme])
+				# rhymes_counter[currentRhyme] += 1
+				# if(rhymes_counter[currentRhyme] == 3):
+				# 	nextRhymeTag()
+				# else:
+				# 	currentRhyme = 1 if currentRhyme == 0 else 0
+				# rhymes_counter[0]
+
+				lines.append(line[:-1].lower())
 				lines.append(" _verse_ ")
 	del lines[-1]
 	lines.append(" _end_ ")

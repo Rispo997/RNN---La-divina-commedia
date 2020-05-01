@@ -37,16 +37,16 @@ with open("../resources/DC-cleaned.txt", 'r', encoding='utf8', errors='ignore') 
 					lines.append(" _end_ ")
 				first = False
 				lines.append("_start_ ")
-				#initRhymeTagSystem()
+				initRhymeTagSystem()
 			else:
-				#insert rhyme tag
-				# lines.append(rhymes[currentRhyme])
-				# rhymes_counter[currentRhyme] += 1
-				# if(rhymes_counter[currentRhyme] == 3):
-				# 	nextRhymeTag()
-				# else:
-				# 	currentRhyme = 1 if currentRhyme == 0 else 0
-				# rhymes_counter[0]
+				insert rhyme tag
+				 lines.append(rhymes[currentRhyme])
+				 rhymes_counter[currentRhyme] += 1
+				 if(rhymes_counter[currentRhyme] == 3):
+				 	nextRhymeTag()
+				 else:
+				 	currentRhyme = 1 if currentRhyme == 0 else 0
+				 rhymes_counter[0]
 
 				lines.append(line[:-1].lower())
 				lines.append(" _verse_ ")

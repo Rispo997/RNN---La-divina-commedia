@@ -2,28 +2,28 @@ from pickle import load
 from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
-from gensim.models.wrappers import FastText
-
 import fasttext
-model = fasttext.train_unsupervised(input='utilities/DC-poem-formatLower.txt', minn=3, maxn=6, dim=100, epoch=20)
+from scipy.ndimage.interpolation import shift
+import fasttext
+Model = fasttext.train_unsupervised(input='utilities/DC-poem-formatLower.txt', minn=3, maxn=6, dim=100, epoch=20)
 text_encoded = []
 # Initialize variables
 array_zero = np.array([0]*100)
 
 for i in range(49):
 	text_encoded.append([0]*100)
-text_encoded.append(model['_start_'])
+text_encoded.append(Model['_start_'])
 text_encoded = [text_encoded]
+print(len(text_encoded[0][0]))
 text_encoded = np.array(text_encoded).reshape(1, 50, 100)
-#print(text_encoded)
 print(text_encoded.shape)
 
 generated = []
-n_words = 2000  
+n_words = 500
 predicted_word = ''
 
 # Load pre-trained data
-model = load_model('models/modelFTSecondTryJust1Epoch.h5')
+model = load_model('models/modelFT.h5')
 tokenizer = load(open('models/tokenizer.pkl', 'rb'))
 #Luca's old but gold generate.py
 # def sample(preds, temperature=0.01):
@@ -48,6 +48,23 @@ tokenizer = load(open('models/tokenizer.pkl', 'rb'))
 # tokenizer = load(open('tokenizer.pkl', 'rb'))
 
 
+# Ho nascosto il codice in una funzione perchè mi vergognavo
+def process_sequence(old_seq,new_value):
+    # Crea un nuovo vettore contenente tutte le parole dalla seconda all'ultima
+    new_seq = []
+    for word in old_seq[0][1:]:
+        encoding = []
+        for n in word:
+            encoding.append(n)
+        new_seq.append(encoding)
+    # Inserisci la nuova parola e sistema la dimensione
+    new_seq.append(new_value)
+    new_seq = [new_seq]
+    new_seq = np.array(new_seq).reshape(1, 50, 100)
+    return new_seq
+
+
+    
 #text_encoded = tokenizer.texts_to_sequences([text])[0]
 
 # Open the file and encode newlines as standalone symbols
@@ -68,7 +85,7 @@ for i in range(n_words):
     # Fix the input sequence's length and predict the word
 	#text_encoded = pad_sequences([text_encoded], maxlen=50, truncating='pre')
     output = model.predict_classes(text_encoded, verbose=0)
-
+    
     #Luca is bull, despite me
     #prediction = model.predict(text_encoded, verbose=0)[0]
     #val = sample(prediction)
@@ -79,9 +96,9 @@ for i in range(n_words):
     #predicted_word = tokenizer.sequences_to_texts([output])[0]
     #print(output)
     predicted_word = tokens[output[0]]
+    text_encoded = process_sequence(text_encoded,Model[predicted_word])
     generated.append(predicted_word)
     # Update the input text for next prediction
-    text_encoded = np.append(text_encoded[0],output)
     if predicted_word == '_end_':
     	break
 

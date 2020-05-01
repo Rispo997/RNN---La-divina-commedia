@@ -4,8 +4,6 @@ from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 from gensim.models.wrappers import FastText
 
-<<<<<<< HEAD
-
 import fasttext
 model = fasttext.train_unsupervised(input='utilities/DC-poem-formatLower.txt', minn=3, maxn=6, dim=100, epoch=20)
 text_encoded = []
@@ -25,30 +23,30 @@ n_words = 2000
 predicted_word = ''
 
 # Load pre-trained data
-model = load_model('models/modelTry.h5')
+model = load_model('models/modelFTSecondTryJust1Epoch.h5')
 tokenizer = load(open('models/tokenizer.pkl', 'rb'))
-=======
-def sample(preds, temperature=0.01):
-     # helper function to sample an index from a probability array
-    preds = np.asarray(preds).astype('float64')
-    preds = np.log(preds) / temperature
-    exp_preds = np.exp(preds)
-    preds = exp_preds / np.sum(exp_preds)
+#Luca's old but gold generate.py
+# def sample(preds, temperature=0.01):
+#      # helper function to sample an index from a probability array
+#     preds = np.asarray(preds).astype('float64')
+#     preds = np.log(preds) / temperature
+#     exp_preds = np.exp(preds)
+#     preds = exp_preds / np.sum(exp_preds)
 
-    probas = np.random.multinomial(1, preds, 1)
-    return np.argmax(probas)
+#     probas = np.random.multinomial(1, preds, 1)
+#     return np.argmax(probas)
     
-# Initialize variables
-text = '_pad_ '*49 + ' _start_ '
-print(text)
-generated = []
-n_words = 1000 
-predicted_word = ''
+# # Initialize variables
+# text = '_pad_ '*49 + ' _start_ '
+# print(text)
+# generated = []
+# n_words = 1000 
+# predicted_word = ''
 
-# Load pre-trained data
-model = load_model('weights-100-2.8770.hdf5')
-tokenizer = load(open('tokenizer.pkl', 'rb'))
->>>>>>> 543d856a145033e4a917aad8ff3c5b297b10e598
+# # Load pre-trained data
+# model = load_model('weights-100-2.8770.hdf5')
+# tokenizer = load(open('tokenizer.pkl', 'rb'))
+
 
 #text_encoded = tokenizer.texts_to_sequences([text])[0]
 
@@ -68,29 +66,27 @@ tokens = list(set(words))
 #while predicted_word != '_end_':
 for i in range(n_words):
     # Fix the input sequence's length and predict the word
-<<<<<<< HEAD
-    #text_encoded = pad_sequences([text_encoded], maxlen=50, truncating='pre')
+	#text_encoded = pad_sequences([text_encoded], maxlen=50, truncating='pre')
     output = model.predict_classes(text_encoded, verbose=0)
-=======
-    text_encoded = pad_sequences([text_encoded], maxlen=50, truncating='pre')
-   # output = model.predict_classes(text_encoded, verbose=0)
-    prediction = model.predict(text_encoded, verbose=0)[0]
-    val = sample(prediction)
-    output = np.array([val])
->>>>>>> 543d856a145033e4a917aad8ff3c5b297b10e598
-    # Translate the predicted word and add it to the result
+
+    #Luca is bull, despite me
+    #prediction = model.predict(text_encoded, verbose=0)[0]
+    #val = sample(prediction)
+    #output = np.array([val])
+    #---------------------
+
+	# Translate the predicted word and add it to the result
     #predicted_word = tokenizer.sequences_to_texts([output])[0]
     #print(output)
     predicted_word = tokens[output[0]]
     generated.append(predicted_word)
     # Update the input text for next prediction
-<<<<<<< HEAD
     text_encoded = np.append(text_encoded[0],output)
     if predicted_word == '_end_':
     	break
-=======
-    text_encoded = np.append(text_encoded[0],sample(prediction))
->>>>>>> 543d856a145033e4a917aad8ff3c5b297b10e598
+
+    #Luca's old but gold
+    #text_encoded = np.append(text_encoded[0],sample(prediction))
     
 # Format and print the result
 generated = ['\n' if x=='_verse_' or x=='_end_' else x for x in generated]

@@ -3,32 +3,46 @@ from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 
+def sample(preds, temperature=0.01):
+     # helper function to sample an index from a probability array
+    preds = np.asarray(preds).astype('float64')
+    preds = np.log(preds) / temperature
+    exp_preds = np.exp(preds)
+    preds = exp_preds / np.sum(exp_preds)
+
+    probas = np.random.multinomial(1, preds, 1)
+    return np.argmax(probas)
+    
 # Initialize variables
-text = '_pad_'*19 + '_start_'
+text = '_pad_ '*49 + ' _start_ '
+print(text)
 generated = []
-n_words = 500  
+n_words = 1000 
 predicted_word = ''
 
 # Load pre-trained data
-model = load_model('models/model.h5')
-tokenizer = load(open('models/tokenizer.pkl', 'rb'))
+model = load_model('weights-100-2.8770.hdf5')
+tokenizer = load(open('tokenizer.pkl', 'rb'))
 
 text_encoded = tokenizer.texts_to_sequences([text])[0]
 
 while predicted_word != '_end_':
 #for i in range(n_words):
     # Fix the input sequence's length and predict the word
-    text_encoded = pad_sequences([text_encoded], maxlen=20, truncating='pre')
-    output = model.predict_classes(text_encoded, verbose=0)
+    text_encoded = pad_sequences([text_encoded], maxlen=50, truncating='pre')
+   # output = model.predict_classes(text_encoded, verbose=0)
+    prediction = model.predict(text_encoded, verbose=0)[0]
+    val = sample(prediction)
+    output = np.array([val])
     # Translate the predicted word and add it to the result
     predicted_word = tokenizer.sequences_to_texts([output])[0]
     generated.append(predicted_word)
     # Update the input text for next prediction
-    text_encoded = np.append(text_encoded[0],output)
+    text_encoded = np.append(text_encoded[0],sample(prediction))
     
 # Format and print the result
 generated = ['\n' if x=='_verse_' or x=='_end_' else x for x in generated]
 output = ' '.join(generated)
 print(*generated)
-with open("output/canto.txt", "w") as file:
+with open("output/seq50epoch100.txt", "w") as file:
 	file.write(output)

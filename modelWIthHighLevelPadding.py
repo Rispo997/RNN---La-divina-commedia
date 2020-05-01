@@ -7,8 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/1JEOAjAZLP7bJt1uXLtFX0NIPozZGlIOs
 """
 
-from google.colab import drive
-drive.mount('/content/gdrive')
+# from google.colab import drive
+# drive.mount('/content/gdrive')
 
 from keras.preprocessing.text import Tokenizer
 from keras import regularizers
@@ -25,7 +25,7 @@ from keras.optimizers import Adam
 from keras.metrics import CategoricalCrossentropy
 from pickle import dump
 import numpy as np
-from google.colab import files
+# from google.colab import files
 # To Do
 # - Testare differenti tipi di architetture per la rete neurale (Layers,Activation function,dropout,batch size,epochs)
 # - Testare differenti tipi di SEQUENCE_LEN
@@ -73,10 +73,10 @@ class PlotLearning(Callback):
         
         plt.show();
 
-uploaded = files.upload()
+# uploaded = files.upload()
 
 # Open the file and encode newlines as standalone symbols
-with open("DC-poem-format.txt", encoding='latin-1') as file:
+with open("resources/DC-poem-format.txt", encoding='latin-1') as file:
     text = file.read().lower()
 
 print('Number of Characters is:', len(text))
@@ -137,7 +137,7 @@ Y = np.array(Y)
 Y = to_categorical(Y, num_classes=vocab_size)
 
 # Create the neural network
-model_filepath="weights.best.hdf5"
+model_filepath="weights-{epoch:02d}-{loss:.4f}.hdf5"
 model = Sequential()
 model.add(Embedding(vocab_size, 50, input_length=X.shape[1], mask_zero=True))
 model.add(LSTM(100, return_sequences=True))
@@ -155,4 +155,5 @@ ck = ModelCheckpoint(model_filepath, monitor='categorical_crossentropy', verbose
 
 # Start Training
 model.fit(X, Y, batch_size=128, epochs=100, callbacks=[es,ck,PlotLearning()])
-model.save('/content/gdrive/My Drive/Dante_model/model.h5')
+#model.save('/content/gdrive/My Drive/Dante_model/model.h5')
+model.save('model-last.h5')

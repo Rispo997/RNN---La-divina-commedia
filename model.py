@@ -10,6 +10,7 @@ from keras.callbacks import EarlyStopping
 from pickle import dump
 from utilities.plot import plot
 import numpy as np
+from keras.models import load_model
 # To Do
 # - Testare differenti tipi di architetture per la rete neurale (Layers,Activation function,dropout,batch size,epochs)
 # - Testare differenti tipi di SEQUENCE_LEN
@@ -17,7 +18,7 @@ import numpy as np
 # - Valutare l'idea di un'approccio character-based
 
 #Initialize parameters
-SEQUENCE_LEN = 20 # The length of each sequence used to predict
+SEQUENCE_LEN = 50 # The length of each sequence used to predict
 STEP = 1 # Stride
 X = [] # Input Variables 
 Y = [] # Output Variables
@@ -82,7 +83,8 @@ print(model.summary())
 # Define Callbacks
 es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, patience=10)
 ck = ModelCheckpoint(model_filepath, monitor='accuracy', verbose=1, save_best_only=True, mode='max')
-
+# model = load_model('weights.hdf5')
+# model.fit(X, Y, batch_size=128, epochs=38,callbacks=[es,ck,plot])
 # Start Training
 model.fit(X, Y, batch_size=128, epochs=100,callbacks=[es,ck,plot])
 model.save('model.h5')

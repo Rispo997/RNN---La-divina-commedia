@@ -4,12 +4,15 @@ from keras.preprocessing.sequence import pad_sequences
 import numpy as np
 import fasttext
 from scipy.ndimage.interpolation import shift
-import fasttext
-Model = fasttext.train_unsupervised(input='utilities/DC-poem-formatLower.txt', minn=3, maxn=6, dim=100, epoch=20)
-text_encoded = []
-# Initialize variables
-array_zero = np.array([0]*100)
+from scipy import spatial
+from gensim.models import fasttext
+import fasttext as FT
+#Model = fasttext.train_unsupervised(input='utilities/DC-poem-formatUTF.txt', minn=3, maxn=6, dim=100, epoch=20)
+#text_encoded = []
 
+Model = fasttext.load_facebook_vectors("utilities/embeddings.bin", encoding='utf-8')
+
+# Initialize variables
 for i in range(49):
 	text_encoded.append([0]*100)
 text_encoded.append(Model['_start_'])
@@ -23,7 +26,7 @@ n_words = 500
 predicted_word = ''
 
 # Load pre-trained data
-model = load_model('models/modelFT.h5')
+model = load_model('models/modelFTVector100Epoch.h5')
 tokenizer = load(open('models/tokenizer.pkl', 'rb'))
 #Luca's old but gold generate.py
 # def sample(preds, temperature=0.01):
@@ -68,7 +71,7 @@ def process_sequence(old_seq,new_value):
 #text_encoded = tokenizer.texts_to_sequences([text])[0]
 
 # Open the file and encode newlines as standalone symbols
-with open("utilities/DC-poem-formatLower.txt", encoding='latin-1') as file:
+with open("utilities/DC-poem-formatUTF.txt", encoding='latin-1') as file:
     text = file.read().lower()
 
 # Fetch all the words inside the file
@@ -79,13 +82,14 @@ print('The length of the text:', len(words))
 vocab_size = len(set(words))
 tokens = list(set(words))
 
-#print(text_encoded)
-#print("\n")
+
 #while predicted_word != '_end_':
 for i in range(n_words):
     # Fix the input sequence's length and predict the word
 	#text_encoded = pad_sequences([text_encoded], maxlen=50, truncating='pre')
-    output = model.predict_classes(text_encoded, verbose=0)
+    #Categorical FastText
+    #output = model.predict_classes(text_encoded, verbose=0)
+    output = model.predict(text_encoded, verbose=0)[0]
     
     #Luca is bull, despite me
     #prediction = model.predict(text_encoded, verbose=0)[0]
@@ -96,10 +100,30 @@ for i in range(n_words):
 	# Translate the predicted word and add it to the result
     #predicted_word = tokenizer.sequences_to_texts([output])[0]
     #print(output)
-    predicted_word = tokens[output[0]]
+    
+    #Categorical FastText
+    #predicted_word = tokens[output[0]]
+    #text_encoded = process_sequence(text_encoded,Model[predicted_word])
+    
+    
+    predicted_word = Model.similar_by_vector(output, topn = 1)[0][0]
+
+    #words = Model.get_words()
+    # min = spatial.distance.cosine(output, Model[words[0]])
+    # id_min = 0
+    # for i in range(1, len(words)):
+    #     cs = spatial.distance.cosine(output, Model[words[i]])
+    #     if  cs < min:
+    #         min = cs
+    #         id_min = i 
+
+    # predicted_word = words[id_min]
+    if i < 20:
+        print(output)
+        print(" => ")
+        print(predicted_word)
     text_encoded = process_sequence(text_encoded,Model[predicted_word])
-    #print(text_encoded)
-    #print("\n")
+
     generated.append(predicted_word)
     # Update the input text for next prediction
     if predicted_word == '_end_':
@@ -112,5 +136,5 @@ for i in range(n_words):
 generated = ['\n' if x=='_verse_' or x=='_end_' else x for x in generated]
 output = ' '.join(generated)
 print(*generated)
-#with open("output/seq50epoch100.txt", "w") as file:
-#	file.write(output)
+with open("output/cantoFT.txt", "w") as file:
+	file.write(output)

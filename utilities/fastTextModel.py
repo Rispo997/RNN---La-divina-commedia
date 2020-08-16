@@ -8,17 +8,19 @@ import fasttext
 model = fasttext.train_unsupervised(input='DC-poem-formatUTF.txt', minn=3, maxn=6, dim=100, epoch=20)
 
 
-model.save_model("embeddings.bin")
+#model.save_model("embeddings.bin")
+
+
+printN("_verse_", model)
+printN("_start_", model)
+printN("_end_", model)
+
+
+model = fasttext.train_unsupervised(input='output.txt', minn=3, maxn=6, dim=100, epoch=20)
 
 
 
-printN("tanto", model)
-printN("gentile", model)
-printN("onesta", model)
-printN("pare", model)
-printN("la", model)
-printN("donna", model)
-printN("mia", model)
-printN("altrui", model)
-printN("saluta", model)
-printN("")
+printN("w", model)
+printN("_start_", model)
+printN("_end_", model)
+

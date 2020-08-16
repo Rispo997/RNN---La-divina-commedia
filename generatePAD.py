@@ -21,7 +21,7 @@ n_words = 1000
 predicted_word = ''
 
 # Load pre-trained data
-model = load_model('models/weightsHLP-100-2.8770.hdf5')
+model = load_model('models/ValidationModel.h5')
 tokenizer = load(open('models/tokenizerHighLevelPadding.pkl', 'rb'))
 # Encode initial input
 text_encoded = tokenizer.texts_to_sequences([text])[0]

@@ -35,9 +35,9 @@ with open("../resources/DC-cleaned.txt", 'r', encoding='utf8', errors='ignore') 
 			if(line.find("Canto") != -1 and (line.find("Inferno") != -1 or line.find("Purgatorio") != -1 or line.find("Paradiso") != -1)):
 				if (not first):
 					del lines[-1]
-					lines.append("_sol_ _end_ _eol_\n")
+					lines.append("<bol><end><eol>\n")
 				first = False
-				lines.append("_sol_ _start_ _eol_\n")
+				lines.append("<sol><start><eol>\n")
 				#initRhymeTagSystem()
 			else:
 				#insert rhyme tag
@@ -48,17 +48,17 @@ with open("../resources/DC-cleaned.txt", 'r', encoding='utf8', errors='ignore') 
 				#else:
 				#	currentRhyme = 1 if currentRhyme == 0 else 0
 				#rhymes_counter[0]
-				lines.append("_sol_ ")
+				lines.append("<bol>")
 				lines.append(line[:-1].lower().replace("’", "'"))
-				lines.append(" _verse_ _eol_\n")
+				lines.append("<eol>\n")
 				newTercet = True
 		else:
 			if(newTercet):
-				lines.append("_sol_ _tercet_ _eol_\n")
+				lines.append("<bol><tercet><eol>\n")
 				newTercet = False
 	del lines[-1]
-	lines.append(" _verse_ _eol_\n")
-	lines.append("_sol_ _end_ _eol_\n")
+	lines.append("<eol>\n")
+	lines.append("<sol?><end><eol>\n")
 # Writing to file 
 output = open('output.txt', 'w') 
 output.writelines(lines) 
